@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cinpqrfylgrj4" path="res://addons/brisklance/manager/interface/brisklance/brisklance.gd" id="1_7hwos"]
 
-[node name="Brisklance" type="Control" node_paths=PackedStringArray("node_filter_edit", "node_show_install_trigger", "node_show_confirm_delete_trigger", "node_addons_display", "node_self_module_display", "node_install_window", "node_install_repository_name_edit", "node_install_tag_edit", "node_install_trigger", "node_confirm_delete_window")]
+[node name="Brisklance" type="Control" node_paths=PackedStringArray("node_filter_edit", "node_show_install_trigger", "node_show_confirm_delete_trigger", "node_addons_display", "node_self_module_display", "node_install_window", "node_install_repository_name_edit", "node_install_tag_edit", "node_install_trigger", "node_confirm_delete_window", "node_http_request")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ node_install_repository_name_edit = NodePath("InstallWindow/Panel/MarginContaine
 node_install_tag_edit = NodePath("InstallWindow/Panel/MarginContainer/VBoxContainer/Tag/InstallTagEdit")
 node_install_trigger = NodePath("InstallWindow/Panel/MarginContainer/VBoxContainer/InstallTrigger")
 node_confirm_delete_window = NodePath("ConfirmDeleteWindow")
-delete_confirmation_text_prefix = null
+node_http_request = NodePath("HTTPRequest")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -64,7 +64,7 @@ text = "Self Module"
 [node name="SelfModuleDisplay" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "None"
+text = "Brisklance Module"
 
 [node name="InstallWindow" type="Window" parent="."]
 oversampling_override = 1.0
@@ -136,3 +136,6 @@ initial_position = 1
 size = Vector2i(270, 100)
 ok_button_text = "Delete"
 dialog_text = "Are you sure you want to delete?"
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+accept_gzip = false

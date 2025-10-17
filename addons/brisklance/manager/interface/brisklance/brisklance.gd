@@ -13,6 +13,7 @@ class_name BrisklanceInterface
 @export var node_install_tag_edit : LineEdit
 @export var node_install_trigger : BaseButton
 @export var node_confirm_delete_window : ConfirmationDialog
+@export var node_http_request : HTTPRequest
 
 @export_group("Delete Confirmation", "delete_confirmation_")
 @export_multiline var delete_confirmation_text_prefix := "Are you sure you want to delete: "
@@ -80,7 +81,7 @@ func _ready() -> void:
 		if node_install_repository_name_edit.text.is_empty(): return
 		if node_install_tag_edit.text.is_empty(): return
 		var mirror := BrisklancePluginMirror.create(node_install_repository_name_edit.text, node_install_tag_edit.text)
-		if not mirror.retreive(): return
+		if not await mirror.retreive(node_http_request): return
 		if self_plugin_reference:
 			self_plugin_reference.dependencies[node_install_repository_name_edit.text] = node_install_tag_edit.text
 			self_plugin_reference.save_configuration()
