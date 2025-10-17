@@ -6,20 +6,23 @@ on:
       - "v*.*.*"
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
   release:
-    needs: [build]
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+
     steps:
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Zip build
+        working-directory: ${{ github.workspace }}/addons/brisklance/self
+        run: zip -r ${{ github.workspace }}/brisklance_module.zip ./*
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            ${{ github.workspace }}/brisklance_module
+            ${{ github.workspace }}/brisklance_module.zip
