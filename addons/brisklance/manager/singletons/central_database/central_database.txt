@@ -1,0 +1,4 @@
+{
+&"head_plugin_mirror": [],
+&"installed_plugin_mirrors": []
+}

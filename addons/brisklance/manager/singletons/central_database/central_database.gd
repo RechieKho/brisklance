@@ -2,24 +2,18 @@ extends RefCounted
 class_name BrisklanceCentralDatabase
 
 const FILE_NAME := "central_database.txt"
-const HEAD_PLUGIN_REFERENCES_KEY := &"head_plugin_references"
+const HEAD_PLUGIN_MIRROR := &"head_plugin_mirror"
 const INSTALLED_PLUGINS_KEY := &"installed_plugin_mirrors"
 
 var database := {}
 
-var head_plugin_mirrors : Array[BrisklancePluginMirror] :
-	set(p_value): database[HEAD_PLUGIN_REFERENCES_KEY] = p_value
-	get: 
-		var result : Array[BrisklancePluginMirror]
-		result.assign(database.get_or_add(HEAD_PLUGIN_REFERENCES_KEY, []))
-		return result
+var head_plugin_mirrors : Array :
+	set(p_value): database[HEAD_PLUGIN_MIRROR] = p_value
+	get: return database.get_or_add(HEAD_PLUGIN_MIRROR, [])
 
-var installed_plugin_mirrors : Array[BrisklancePluginMirror] :
+var installed_plugin_mirrors : Array :
 	set(p_value): database[INSTALLED_PLUGINS_KEY] = p_value
-	get:
-		var result : Array[BrisklancePluginMirror]
-		result.assign(database.get_or_add(INSTALLED_PLUGINS_KEY, []))
-		return result
+	get: return database.get_or_add(INSTALLED_PLUGINS_KEY, [])
 
 static var singleton : BrisklanceCentralDatabase
 

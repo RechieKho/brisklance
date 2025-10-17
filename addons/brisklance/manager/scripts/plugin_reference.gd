@@ -16,7 +16,7 @@ var name : String :
 	set(p_value): configuration.set_value(PLUGIN_SECTION_KEY, NAME_KEY, p_value)
 	get: return configuration.get_value(PLUGIN_SECTION_KEY, NAME_KEY, "")
 
-var dependencies : Dictionary[String, String] :
+var dependencies : Dictionary :
 	set(p_value): configuration.set_value(BRISKLANCE_SECTION_KEY, DEPENDENCIES_KEY, p_value)
 	get:
 		if not configuration.has_section_key(BRISKLANCE_SECTION_KEY, DEPENDENCIES_KEY):
