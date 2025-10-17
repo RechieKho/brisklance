@@ -1,0 +1,138 @@
+[gd_scene load_steps=2 format=3 uid="uid://cbcsha4ckraa4"]
+
+[ext_resource type="Script" uid="uid://cinpqrfylgrj4" path="res://addons/brisklance/manager/interface/brisklance/brisklance.gd" id="1_7hwos"]
+
+[node name="Brisklance" type="Control" node_paths=PackedStringArray("node_filter_edit", "node_show_install_trigger", "node_show_confirm_delete_trigger", "node_addons_display", "node_self_module_display", "node_install_window", "node_install_repository_name_edit", "node_install_tag_edit", "node_install_trigger", "node_confirm_delete_window")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7hwos")
+node_filter_edit = NodePath("MarginContainer/VBoxContainer/Header/FilterEdit")
+node_show_install_trigger = NodePath("MarginContainer/VBoxContainer/Header/ShowInstallTrigger")
+node_show_confirm_delete_trigger = NodePath("MarginContainer/VBoxContainer/Header/ShowConfirmDeleteTrigger")
+node_addons_display = NodePath("MarginContainer/VBoxContainer/AddonsDisplay")
+node_self_module_display = NodePath("MarginContainer/VBoxContainer/HBoxContainer/SelfModuleDisplay")
+node_install_window = NodePath("InstallWindow")
+node_install_repository_name_edit = NodePath("InstallWindow/Panel/MarginContainer/VBoxContainer/RepositoryName/InstallRepositoryNameEdit")
+node_install_tag_edit = NodePath("InstallWindow/Panel/MarginContainer/VBoxContainer/Tag/InstallTagEdit")
+node_install_trigger = NodePath("InstallWindow/Panel/MarginContainer/VBoxContainer/InstallTrigger")
+node_confirm_delete_window = NodePath("ConfirmDeleteWindow")
+delete_confirmation_text_prefix = null
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="FilterEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Filter Addons"
+
+[node name="ShowInstallTrigger" type="Button" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+text = "Install"
+
+[node name="ShowConfirmDeleteTrigger" type="Button" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+text = "Delete"
+
+[node name="AddonsDisplay" type="ItemList" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Self Module"
+
+[node name="SelfModuleDisplay" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "None"
+
+[node name="InstallWindow" type="Window" parent="."]
+oversampling_override = 1.0
+title = "Install"
+initial_position = 1
+size = Vector2i(800, 300)
+visible = false
+always_on_top = true
+exclude_from_capture = true
+minimize_disabled = true
+maximize_disabled = true
+
+[node name="Panel" type="Panel" parent="InstallWindow"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="InstallWindow/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="InstallWindow/Panel/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="RepositoryName" type="HBoxContainer" parent="InstallWindow/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="InstallWindow/Panel/MarginContainer/VBoxContainer/RepositoryName"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Addon Github Repository"
+
+[node name="InstallRepositoryNameEdit" type="LineEdit" parent="InstallWindow/Panel/MarginContainer/VBoxContainer/RepositoryName"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "author/plugin_name"
+
+[node name="Tag" type="HBoxContainer" parent="InstallWindow/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="InstallWindow/Panel/MarginContainer/VBoxContainer/Tag"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Addon Github Tag"
+
+[node name="InstallTagEdit" type="LineEdit" parent="InstallWindow/Panel/MarginContainer/VBoxContainer/Tag"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "v1.0.0"
+
+[node name="InstallTrigger" type="Button" parent="InstallWindow/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Install"
+
+[node name="ConfirmDeleteWindow" type="ConfirmationDialog" parent="."]
+oversampling_override = 1.0
+initial_position = 1
+size = Vector2i(270, 100)
+ok_button_text = "Delete"
+dialog_text = "Are you sure you want to delete?"
