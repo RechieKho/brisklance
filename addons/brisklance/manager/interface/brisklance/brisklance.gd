@@ -19,8 +19,8 @@ class_name BrisklanceInterface
 @export_multiline var delete_confirmation_text_prefix := "Are you sure you want to delete: "
 
 var self_plugin_reference : BrisklancePluginReference
-
-var deletion_plugin_mirror_index := -1
+var filtered_plugin_mirror : Array
+var deletion_plugin_mirror : BrisklancePluginMirror
 
 static func get_packed_scene() -> PackedScene:
 	return preload("res://addons/brisklance/manager/interface/brisklance/brisklance.tscn") as PackedScene
@@ -31,22 +31,31 @@ func update_self_plugin_reference() -> void:
 
 func update_addons_display() -> void:
 	node_addons_display.clear()
-	for plugin_reference in BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors:
-		node_addons_display.add_item(plugin_reference.repository_name)
+	filtered_plugin_mirror.clear()
+	for plugin_mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors:
+		if not node_filter_edit.text.is_empty():
+			if not plugin_mirror.repository_name.contains(node_filter_edit.text): continue
+		filtered_plugin_mirror.append(plugin_mirror)
+		node_addons_display.add_item(plugin_mirror.repository_name)
 
-func get_selected_plugin_reference_index() -> int:
+func get_selected_plugin_mirror() -> BrisklancePluginMirror:
 	var selected_indices := node_addons_display.get_selected_items()
-	if selected_indices.is_empty(): return -1
+	if selected_indices.is_empty(): return null
 	var selected_index := selected_indices[0]
-	return selected_index
+	return filtered_plugin_mirror[selected_index]
 
 func refresh_editor() -> void:
 	await get_tree().process_frame
 	EditorInterface.get_resource_filesystem().scan()
+	EditorInterface.get_resource_filesystem().scan_sources()
 
 func _ready() -> void:
 	update_self_plugin_reference()
 	update_addons_display()
+	
+	node_filter_edit.text_changed.connect(func(_p_new_text) -> void:
+		update_addons_display()
+	)
 	
 	node_show_install_trigger.pressed.connect(func() -> void:
 		node_install_window.show()
@@ -56,21 +65,18 @@ func _ready() -> void:
 	)
 	
 	node_show_confirm_delete_trigger.pressed.connect(func() -> void:
-		var selected_index := get_selected_plugin_reference_index()
-		deletion_plugin_mirror_index = selected_index
-		if selected_index < 0: return
-		var mirror = BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors[selected_index]
-		node_confirm_delete_window.dialog_text = "{0} '{1}'".format([delete_confirmation_text_prefix, mirror.repository_name])
+		deletion_plugin_mirror = get_selected_plugin_mirror()
+		if not deletion_plugin_mirror: return
+		node_confirm_delete_window.dialog_text = "{0} '{1}'".format([delete_confirmation_text_prefix, deletion_plugin_mirror.repository_name])
 		node_confirm_delete_window.show()
 	)
 	
 	node_confirm_delete_window.confirmed.connect(func() -> void:
-		if deletion_plugin_mirror_index < 0: return
-		var plugin_mirror := BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors[deletion_plugin_mirror_index] as BrisklancePluginMirror
-		self_plugin_reference.dependencies.erase(plugin_mirror.repository_name)
+		if not deletion_plugin_mirror: return
+		self_plugin_reference.dependencies.erase(deletion_plugin_mirror.repository_name)
 		self_plugin_reference.save_configuration()
-		plugin_mirror.purge()
-		BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors.remove_at(deletion_plugin_mirror_index)
+		deletion_plugin_mirror.purge()
+		BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors.erase(deletion_plugin_mirror)
 		BrisklanceCentralDatabase.get_singleton().save_database()
 		update_addons_display()
 		refresh_editor()
@@ -94,7 +100,6 @@ func _ready() -> void:
 			BrisklanceCentralDatabase.get_singleton().save_database()
 			update_addons_display()
 		refresh_editor()
-		print(BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors)
 		node_install_window.hide()
 	)
 	
