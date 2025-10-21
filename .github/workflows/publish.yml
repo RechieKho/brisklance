@@ -16,9 +16,13 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Zip build
+      - name: Zip module
         working-directory: ${{ github.workspace }}/addons/brisklance/self
         run: zip -r ${{ github.workspace }}/brisklance_module.zip ./*
+
+      - name: Zip module
+        working-directory: ${{ github.workspace }}/addons/brisklance
+        run: zip -r ${{ github.workspace }}/brisklance.zip ./*
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -26,3 +30,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ${{ github.workspace }}/brisklance_module.zip
+            ${{ github.workspace }}/brisklance.zip
+            

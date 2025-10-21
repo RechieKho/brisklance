@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cinpqrfylgrj4" path="res://addons/brisklance/manager/interface/brisklance/brisklance.gd" id="1_7hwos"]
 
-[node name="Brisklance" type="Control" node_paths=PackedStringArray("node_filter_edit", "node_show_install_trigger", "node_show_confirm_delete_trigger", "node_addons_display", "node_self_module_display", "node_install_window", "node_install_repository_name_edit", "node_install_tag_edit", "node_install_trigger", "node_confirm_delete_window", "node_http_request")]
+[node name="Brisklance" type="Control" node_paths=PackedStringArray("node_filter_edit", "node_show_install_trigger", "node_show_confirm_delete_trigger", "node_addons_display", "node_install_window", "node_install_repository_name_edit", "node_install_tag_edit", "node_install_trigger", "node_confirm_delete_window", "node_http_request")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,7 +14,6 @@ node_filter_edit = NodePath("MarginContainer/VBoxContainer/Header/FilterEdit")
 node_show_install_trigger = NodePath("MarginContainer/VBoxContainer/Header/ShowInstallTrigger")
 node_show_confirm_delete_trigger = NodePath("MarginContainer/VBoxContainer/Header/ShowConfirmDeleteTrigger")
 node_addons_display = NodePath("MarginContainer/VBoxContainer/AddonsDisplay")
-node_self_module_display = NodePath("MarginContainer/VBoxContainer/HBoxContainer/SelfModuleDisplay")
 node_install_window = NodePath("InstallWindow")
 node_install_repository_name_edit = NodePath("InstallWindow/Panel/MarginContainer/VBoxContainer/RepositoryName/InstallRepositoryNameEdit")
 node_install_tag_edit = NodePath("InstallWindow/Panel/MarginContainer/VBoxContainer/Tag/InstallTagEdit")
@@ -52,19 +51,6 @@ text = "Delete"
 [node name="AddonsDisplay" type="ItemList" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Self Module"
-
-[node name="SelfModuleDisplay" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Brisklance Module"
 
 [node name="InstallWindow" type="Window" parent="."]
 oversampling_override = 1.0

@@ -7,7 +7,7 @@ const CONFIGURATION_FILE_NAME := "plugin.cfg"
 const PLUGIN_SECTION_KEY := &"plugin"
 const BRISKLANCE_SECTION_KEY := &"brisklance"
 const NAME_KEY := &"name"
-const DEPENDENCIES_KEY := &"dependencies"
+const DEPENDENCY_DICTIONARY_KEY := &"dependencies"
 
 var configuration_file_path : String
 var configuration : ConfigFile
@@ -16,12 +16,12 @@ var name : String :
 	set(p_value): configuration.set_value(PLUGIN_SECTION_KEY, NAME_KEY, p_value)
 	get: return configuration.get_value(PLUGIN_SECTION_KEY, NAME_KEY, "")
 
-var dependencies : Dictionary :
-	set(p_value): configuration.set_value(BRISKLANCE_SECTION_KEY, DEPENDENCIES_KEY, p_value)
+var dependency_dictionary : Dictionary :
+	set(p_value): configuration.set_value(BRISKLANCE_SECTION_KEY, DEPENDENCY_DICTIONARY_KEY, p_value)
 	get:
-		if not configuration.has_section_key(BRISKLANCE_SECTION_KEY, DEPENDENCIES_KEY):
-			configuration.set_value(BRISKLANCE_SECTION_KEY, DEPENDENCIES_KEY, {})
-		return configuration.get_value(BRISKLANCE_SECTION_KEY, DEPENDENCIES_KEY)
+		if not configuration.has_section_key(BRISKLANCE_SECTION_KEY, DEPENDENCY_DICTIONARY_KEY):
+			configuration.set_value(BRISKLANCE_SECTION_KEY, DEPENDENCY_DICTIONARY_KEY, {})
+		return configuration.get_value(BRISKLANCE_SECTION_KEY, DEPENDENCY_DICTIONARY_KEY)
 
 static func find(p_directory_path: String) -> BrisklancePluginReference:
 	var file_path := p_directory_path.path_join(CONFIGURATION_FILE_NAME)

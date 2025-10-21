@@ -7,7 +7,7 @@ const PLUGINS_DIRECTORY_NAME := "plugins"
 
 var repository_name : String
 var repository_tag : String
-var installed_dependent_plugin_mirrors : Array
+var dependencies : Array
 
 static func remove_directory_recursively(p_directory_path: String) -> void:
 	var directory := DirAccess.open(p_directory_path)
@@ -38,17 +38,20 @@ func get_mirror_url() -> String:
 func get_plugin_directory_path() -> String:
 	return BrisklanceEditorPlugin.BRISKLANCE_DIRECTORY_PATH.path_join(PLUGINS_DIRECTORY_NAME).path_join(str(hash(repository_name)))
 
-func purge() -> void:
-	BrisklanceCentralDatabase.get_singleton().installed_plugin_mirrors = BrisklanceCentralDatabase.get_singleton().installed_plugin_mirrors.filter(func(p_mirror: BrisklancePluginMirror) -> bool:
-		return not p_mirror in installed_dependent_plugin_mirrors
-	)
-	BrisklanceCentralDatabase.get_singleton().save_database()
-	for mirror : BrisklancePluginMirror in installed_dependent_plugin_mirrors:
-		mirror.purge()
+func purge_self() -> void:
 	remove_directory_recursively(get_plugin_directory_path())
 
+func purge_all() -> void:
+	for mirror : BrisklancePluginMirror in dependencies:
+		mirror.purge_all()
+	purge_self()
 
-func retreive(p_http_request: HTTPRequest) -> BrisklancePluginReference:
+func add_self_to_dependency_dictionary_recursively(p_dictionary: Dictionary) -> void:
+	p_dictionary[repository_name] = repository_tag
+	for dependency : BrisklancePluginMirror in dependencies:
+		dependency.add_self_to_dependency_dictionary_recursively(p_dictionary)
+
+func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	var plugin_directory_path := get_plugin_directory_path()
 	var plugin_reference := BrisklancePluginReference.find(plugin_directory_path)
 	if plugin_reference: return plugin_reference
@@ -87,42 +90,22 @@ func retreive(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	print("'{0}' unzipped.".format([repository_name]))
 	
 	plugin_reference = BrisklancePluginReference.find(plugin_directory_path)
-	if not plugin_reference: 
-		printerr("Unable to find plugin configuration for '{0}'.".format([repository_name]))
-		return null
-	
-	for dependency_repository_name in plugin_reference.dependencies.keys():
-		for mirror in BrisklanceCentralDatabase.get_singleton().head_plugin_mirrors:
-			if mirror.repository_name == dependency_repository_name: continue
-		
-		for mirror in installed_dependent_plugin_mirrors:
-			if mirror.repository_name == dependency_repository_name:
-				printerr("'{0}' has already been installed by another plugin. Please install the plugin of acceptable version manually.")
-				for newly_installed : BrisklancePluginMirror in installed_dependent_plugin_mirrors: 
-					newly_installed.purge()
-				purge()
-				return null
-		
-		for mirror in BrisklanceCentralDatabase.get_singleton().installed_plugin_mirrors:
-			if mirror.repository_name == dependency_repository_name:
-				printerr("'{0}' has already been installed by another plugin. Please install the plugin of acceptable version manually.")
-				for newly_installed : BrisklancePluginMirror in installed_dependent_plugin_mirrors: 
-					newly_installed.purge()
-				purge()
-				return null
-		
-		var depencency := BrisklancePluginMirror.create(dependency_repository_name, plugin_reference.dependencies[dependency_repository_name])
-		var dependency_plugin_reference := await depencency.retreive(p_http_request)
-		if not dependency_plugin_reference:
-			printerr("'{0}' cannot be installed due to '{1}'.".format([repository_name, dependency_repository_name]))
-			for newly_installed : BrisklancePluginMirror in installed_dependent_plugin_mirrors: 
-				newly_installed.purge()
-			purge()
-			return null
-		
-		installed_dependent_plugin_mirrors.push_back(depencency)
-	
-	BrisklanceCentralDatabase.get_singleton().installed_plugin_mirrors.append_array(installed_dependent_plugin_mirrors)
-	BrisklanceCentralDatabase.get_singleton().save_database()
-	
+	if not plugin_reference: purge_self()
 	return plugin_reference
+
+func install(p_http_request: HTTPRequest, p_already_installed_dependency_repository_names := []) -> bool:
+	dependencies.clear()
+	var plugin_reference := await retreive_self(p_http_request)
+	var plugin_mirror_repository_name := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
+	for dependency_repository_name : String in plugin_reference.dependency_dictionary.keys():
+		if dependency_repository_name in plugin_mirror_repository_name: continue
+		if dependency_repository_name in p_already_installed_dependency_repository_names:
+			purge_all()
+			printerr("Plugin conflict: '{0}' attempted to be installed by '{1}' is already installed, please install the dependency manually to proceed.".format([dependency_repository_name, repository_name]))
+			return false
+		var dependency_repository_tag := plugin_reference.dependency_dictionary[dependency_repository_name] as String
+		var dependency := BrisklancePluginMirror.create(dependency_repository_name, dependency_repository_tag)
+		if not await dependency.install(p_http_request, p_already_installed_dependency_repository_names): return false
+		p_already_installed_dependency_repository_names.append(dependency_repository_name)
+		dependencies.append(dependency)
+	return true
