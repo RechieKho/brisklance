@@ -28,6 +28,11 @@ static func create(p_repository_name: String, p_repository_tag: String) -> Brisk
 	result.repository_tag = p_repository_tag
 	return result
 
+func make_legible_directory_name() -> String:
+	var regex := RegEx.new()
+	regex.compile("[^A-Za-z\\d_]")
+	return regex.sub("{0}_{1}".format([repository_name, repository_tag]), "_", true)
+
 func get_mirror_url() -> String:
 	return "https://github.com/{repository_name}/releases/download/{repository_tag}/{zip_file_name}".format({
 		"repository_name": repository_name,
@@ -36,7 +41,12 @@ func get_mirror_url() -> String:
 	})
 
 func get_plugin_directory_path() -> String:
-	return BrisklanceEditorPlugin.BRISKLANCE_DIRECTORY_PATH.path_join(PLUGINS_DIRECTORY_NAME).path_join(str(hash(repository_name)))
+	return (
+		BrisklanceEditorPlugin
+		.BRISKLANCE_DIRECTORY_PATH
+		.path_join(PLUGINS_DIRECTORY_NAME)
+		.path_join(make_legible_directory_name())
+	)
 
 func purge_self() -> void:
 	remove_directory_recursively(get_plugin_directory_path())
