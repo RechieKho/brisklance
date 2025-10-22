@@ -65,9 +65,16 @@ func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 		printerr("Fail to download '{0}' from '{1}' (Error: {2}).".format([repository_name, mirror_url, error_string(request_status)]))
 		return null
 	print("Downloading '{0}'.".format([repository_name]))
-	await p_http_request.request_completed as Array
+	var download_request_result := await p_http_request.request_completed as Array
+	var download_response_code := download_request_result[1] as int
+	if download_response_code != 200:
+		printerr(
+			"Fail to download '{0}' from '{1} (Response Code: {2})."
+			.format([repository_name, mirror_url, download_response_code]),
+		)
+		return null
 	print("'{0}' downloaded.".format([repository_name]))
-
+	
 	print("Unzipping '{0}'.".format([repository_name]))
 	var zip_reader := ZIPReader.new()
 	var zip_reader_status := zip_reader.open(zip_file_path)
