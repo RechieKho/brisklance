@@ -16,6 +16,11 @@ Then, extract the files and place it under `res://addons/brisklance` directory a
 However, if you are attempting to create plugins that could be installed via brisklance, it would be wise to utilize this repository as a template.
 This is because this template already set up the necessary github workflow to publish your plugin in the format acceptable to brisklance.
 
+## Export addons to Brisklance
+
+To make your addons accessible by Brisklance, the only requirement is to upload a `brisklance_module.zip` file as asset to the release of your Github repository.
+This is usually automated with Github workflow. Once you set up the file, brisklance will find the file, download it and extract the content to `res://addons/brisklance/plugins` directory.
+
 ## Directories Descriptions
 
 Here discusses the curcial directory and its description to further explain on how brisklance works.
