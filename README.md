@@ -9,6 +9,10 @@ It utilize Github's release as host to host archives.
 To setup brisklance, you will need to download the `brisklance.zip` from the [release page](https://github.com/RechieKho/brisklance/releases).
 Then, extract the files and place it under `res://addons/brisklance` directory as it matches the directories shown in [Directories Description](#directories-descriptions)
 
+> [!CAUTION]
+> The user should exclude the `res://addons/brisklance/manager` from exporting.
+> This is because it includes development-specific files, such as tools scripts that uses `EditorInterface` that would fail in exports, and sensitive data, such as Github API access keys.
+
 However, if you are attempting to create plugins that could be installed via brisklance, it would be wise to utilize this repository as a template.
 This is because this template already set up the necessary github workflow to publish your plugin in the format acceptable to brisklance.
 
