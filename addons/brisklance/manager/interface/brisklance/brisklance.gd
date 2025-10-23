@@ -36,7 +36,7 @@ func update_addons_display() -> void:
 		if not node_filter_edit.text.is_empty():
 			if not plugin_mirror.repository_name.contains(node_filter_edit.text): continue
 		filtered_plugin_mirror.append(plugin_mirror)
-		node_addons_display.add_item(plugin_mirror.repository_name)
+		node_addons_display.add_item("{0} ({1})".format([plugin_mirror.repository_name, plugin_mirror.repository_tag]))
 
 func update_self_plugin_reference() -> void:
 	var self_plugin_reference := BrisklancePluginReference.load_self_plugin_reference()
