@@ -22,6 +22,37 @@ static func remove_directory_recursively(p_directory_path: String) -> void:
 	
 	DirAccess.remove_absolute(p_directory_path)
 
+static func extract_zip_recursively_to_path(p_zip_file_path: String, p_target_directory_path: String) -> bool:
+	var zip_reader := ZIPReader.new()
+	var zip_reader_status := zip_reader.open(p_zip_file_path)
+	if zip_reader_status != OK:
+		printerr("Fail to unzip '{0}' (Error: {1}).".format([p_zip_file_path, error_string(zip_reader_status)]))
+		return false
+	DirAccess.make_dir_recursive_absolute(p_target_directory_path)
+	var target_directory := DirAccess.open(p_target_directory_path)
+	
+	var file_subpaths = zip_reader.get_files()
+	for file_subpath in file_subpaths:
+		if file_subpath.ends_with("/"):
+			target_directory.make_dir_recursive(file_subpath)
+			continue
+		var target_file_path := target_directory.get_current_dir().path_join(file_subpath)
+		if target_file_path.ends_with(".zip"):
+			var child_zip_file_name := target_file_path.get_file()
+			var temp_directory := DirAccess.create_temp(str(hash(target_file_path)))
+			var child_zip_file_path := temp_directory.get_current_dir().path_join(child_zip_file_name)
+			var child_zip_file = FileAccess.open(child_zip_file_path, FileAccess.WRITE)
+			var child_zip_file_content := zip_reader.read_file(file_subpath)
+			child_zip_file.store_buffer(child_zip_file_content)
+			var target_directory_path := target_file_path.get_basename()
+			extract_zip_recursively_to_path(child_zip_file_path, target_directory_path)
+			continue
+		target_directory.make_dir_recursive(target_file_path.get_base_dir())
+		var target_file = FileAccess.open(target_file_path, FileAccess.WRITE)
+		var target_file_content = zip_reader.read_file(file_subpath)
+		target_file.store_buffer(target_file_content)
+	return false
+
 static func create(p_repository_name: String, p_repository_tag: String) -> BrisklancePluginMirror:
 	var result := BrisklancePluginMirror.new()
 	result.repository_name = p_repository_name
@@ -86,24 +117,7 @@ func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	print("'{0}' downloaded.".format([repository_name]))
 	
 	print("Unzipping '{0}'.".format([repository_name]))
-	var zip_reader := ZIPReader.new()
-	var zip_reader_status := zip_reader.open(zip_file_path)
-	if zip_reader_status != OK:
-		printerr("Fail to unzip '{0}' (Error: {1}).".format([repository_name, error_string(zip_reader_status)]))
-		return null
-	DirAccess.make_dir_recursive_absolute(plugin_directory_path)
-	var plugin_directory := DirAccess.open(plugin_directory_path)
-	
-	var file_subpaths = zip_reader.get_files()
-	for file_subpath in file_subpaths:
-		if file_subpath.ends_with("/"):
-			plugin_directory.make_dir_recursive(file_subpath)
-			continue
-		var target_file_path := plugin_directory.get_current_dir().path_join(file_subpath)
-		plugin_directory.make_dir_recursive(target_file_path.get_base_dir())
-		var target_file = FileAccess.open(target_file_path, FileAccess.WRITE)
-		var target_file_content = zip_reader.read_file(file_subpath)
-		target_file.store_buffer(target_file_content)
+	extract_zip_recursively_to_path(zip_file_path, plugin_directory_path)
 	print("'{0}' unzipped.".format([repository_name]))
 	
 	plugin_reference = BrisklancePluginReference.find(plugin_directory_path)
