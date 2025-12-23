@@ -2,13 +2,13 @@ extends RefCounted
 class_name BrisklanceCentralDatabase
 
 const FILE_NAME := "central_database.txt"
-const HEAD_PLUGIN_MIRROR := &"head_plugin_mirror"
+const HEAD_PLUGIN_MIRRORS_KEY := &"head_plugin_mirrors"
 
 var database := {}
 
 var plugin_mirrors : Array :
-	set(p_value): database[HEAD_PLUGIN_MIRROR] = p_value
-	get: return database.get_or_add(HEAD_PLUGIN_MIRROR, [])
+	set(p_value): database[HEAD_PLUGIN_MIRRORS_KEY] = p_value
+	get: return database.get_or_add(HEAD_PLUGIN_MIRRORS_KEY, [])
 
 static var singleton : BrisklanceCentralDatabase
 

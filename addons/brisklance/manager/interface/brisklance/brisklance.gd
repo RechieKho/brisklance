@@ -7,10 +7,14 @@ class_name BrisklanceInterface
 @export var node_show_install_trigger : BaseButton
 @export var node_show_confirm_delete_trigger : BaseButton
 @export var node_addons_display : ItemList
+@export var node_github_setting_configure_trigger : BaseButton
 @export var node_install_window : Window
 @export var node_install_repository_name_edit : LineEdit
 @export var node_install_tag_edit : LineEdit
 @export var node_install_trigger : BaseButton
+@export var node_configure_github_setting_window : Window
+@export var node_github_setting_api_key_edit : LineEdit
+@export var node_github_setting_save_trigger : BaseButton
 @export var node_confirm_delete_window : ConfirmationDialog
 @export var node_http_request : HTTPRequest
 
@@ -48,6 +52,7 @@ func commit() -> void:
 	await BrisklanceCentralDatabase.get_singleton().install(node_http_request)
 	update_self_plugin_reference()
 	BrisklanceCentralDatabase.get_singleton().save_database()
+	BrisklanceLocalDevelopmentStore.get_singleton().save_store()
 	update_addons_display()
 	if not EditorInterface.get_resource_filesystem().is_scanning(): 
 		EditorInterface.get_resource_filesystem().scan()
@@ -80,6 +85,17 @@ func _ready() -> void:
 		commit()
 	)
 	
+	node_configure_github_setting_window.close_requested.connect(func() -> void:
+		node_configure_github_setting_window.hide()
+		node_filter_edit.grab_focus()
+	)
+	
+	node_github_setting_configure_trigger.pressed.connect(func() -> void:
+		node_github_setting_api_key_edit.text = BrisklanceLocalDevelopmentStore.get_singleton().github_api_key
+		node_configure_github_setting_window.show()
+		node_github_setting_api_key_edit.grab_focus()
+	)
+	
 	node_install_window.close_requested.connect(func() -> void:
 		node_install_window.hide()
 		node_filter_edit.grab_focus()
@@ -96,3 +112,8 @@ func _ready() -> void:
 		node_install_window.hide()
 	)
 	
+	node_github_setting_save_trigger.pressed.connect(func() -> void:
+		BrisklanceLocalDevelopmentStore.get_singleton().github_api_key = node_github_setting_api_key_edit.text
+		commit()
+		node_configure_github_setting_window.hide()
+	)

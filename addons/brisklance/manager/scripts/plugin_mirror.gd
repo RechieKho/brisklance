@@ -64,12 +64,50 @@ func make_legible_directory_name() -> String:
 	regex.compile("[^A-Za-z\\d_]")
 	return regex.sub("{0}_{1}".format([repository_name, repository_tag]), "_", true)
 
-func get_mirror_url() -> String:
-	return "https://github.com/{repository_name}/releases/download/{repository_tag}/{zip_file_name}".format({
+func compute_download_mirror_request_headers() -> PackedStringArray:
+	var headers := PackedStringArray([
+		"Accept: application/octet-stream",
+	])
+	if not BrisklanceLocalDevelopmentStore.get_singleton().github_api_key.is_empty():
+		headers.append("Authorization: Bearer {token}".format({
+			"token": BrisklanceLocalDevelopmentStore.get_singleton().github_api_key
+		}))
+	return headers
+
+func compute_download_mirror_request_url(p_http_request : HTTPRequest) -> String:
+	var github_release_metadata_url := "https://api.github.com/repos/{repository_name}/releases/tags/{repository_tag}".format({
 		"repository_name": repository_name,
-		"repository_tag": repository_tag,
-		"zip_file_name": ZIP_FILE_NAME
+		"repository_tag": repository_tag
 	})
+	
+	var metadata_headers := PackedStringArray([
+		"Accept: application/vnd.github+json",
+	])
+	if not BrisklanceLocalDevelopmentStore.get_singleton().github_api_key.is_empty():
+		metadata_headers.append("Authorization: Bearer {token}".format({
+			"token": BrisklanceLocalDevelopmentStore.get_singleton().github_api_key
+		}))
+	var request_status := p_http_request.request(github_release_metadata_url, metadata_headers, HTTPClient.METHOD_GET)
+	if request_status != OK:
+		printerr("Fail to get metadata of '{0}' (Error: {1}).".format([repository_name, error_string(request_status)]))
+		return ""
+	
+	var download_request_result := await p_http_request.request_completed as Array
+	var download_response_code := download_request_result[1] as int
+	if download_response_code != 200:
+		printerr(
+			"Fail to get metadata '{0}' (Response Code: {1})."
+			.format([repository_name, download_response_code]),
+		)
+		return ""
+	var download_responsee_body := download_request_result[3] as PackedByteArray
+	var metadata = JSON.parse_string(download_responsee_body.get_string_from_utf8())
+	
+	for asset in metadata["assets"]:
+		if asset["name"] != ZIP_FILE_NAME: continue
+		return asset["url"]
+	
+	return ""
 
 func get_plugin_directory_path() -> String:
 	return (
@@ -97,11 +135,13 @@ func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	var plugin_reference := BrisklancePluginReference.find(plugin_directory_path)
 	if plugin_reference: return plugin_reference
 	
-	var mirror_url := get_mirror_url()
+	var mirror_url := await compute_download_mirror_request_url(p_http_request)
+	if mirror_url.is_empty(): return null
 	var temp_directory := DirAccess.create_temp(str(hash(repository_name)))
 	var zip_file_path := temp_directory.get_current_dir().path_join(ZIP_FILE_NAME)
 	p_http_request.download_file = zip_file_path
-	var request_status := p_http_request.request(mirror_url, PackedStringArray(), HTTPClient.METHOD_GET)
+	var headers := compute_download_mirror_request_headers()
+	var request_status := p_http_request.request(mirror_url, headers, HTTPClient.METHOD_GET)
 	if request_status != OK:
 		printerr("Fail to download '{0}' from '{1}' (Error: {2}).".format([repository_name, mirror_url, error_string(request_status)]))
 		return null
@@ -110,7 +150,7 @@ func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	var download_response_code := download_request_result[1] as int
 	if download_response_code != 200:
 		printerr(
-			"Fail to download '{0}' from '{1} (Response Code: {2})."
+			"Fail to download '{0}' from '{1}' (Response Code: {2})."
 			.format([repository_name, mirror_url, download_response_code]),
 		)
 		return null
