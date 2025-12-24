@@ -4,15 +4,19 @@ class_name BrisklanceEditorPlugin
 
 const BRISKLANCE_DIRECTORY_PATH := "res://addons/brisklance"
 
+var manager_exclusion_plugin : BrisklanceManagerExcluderPlugin
 var brisklance_interface : BrisklanceInterface
 
 func _enable_plugin() -> void:
 	# Add autoloads here.
+	manager_exclusion_plugin = BrisklanceManagerExcluderPlugin.new()
+	add_export_plugin(manager_exclusion_plugin)
 	pass
 
 
 func _disable_plugin() -> void:
 	# Remove autoloads here.
+	remove_export_plugin(manager_exclusion_plugin)
 	pass
 
 
