@@ -87,12 +87,20 @@ func compute_download_mirror_request_url(p_http_request : HTTPRequest) -> String
 		metadata_headers.append("Authorization: Bearer {token}".format({
 			"token": BrisklanceLocalDevelopmentStore.get_singleton().github_api_key
 		}))
+	p_http_request.download_file = ""
 	var request_status := p_http_request.request(github_release_metadata_url, metadata_headers, HTTPClient.METHOD_GET)
 	if request_status != OK:
 		printerr("Fail to get metadata of '{0}' (Error: {1}).".format([repository_name, error_string(request_status)]))
 		return ""
 	
 	var download_request_result := await p_http_request.request_completed as Array
+	var download_request_result_result := download_request_result[0] as int
+	if download_request_result_result != HTTPRequest.Result.RESULT_SUCCESS:
+		printerr(
+			"Fail to get metadata '{0}' (Request Result: {1})."
+			.format([repository_name, download_request_result_result]),
+		)
+		return ""
 	var download_response_code := download_request_result[1] as int
 	if download_response_code != 200:
 		printerr(
@@ -100,8 +108,8 @@ func compute_download_mirror_request_url(p_http_request : HTTPRequest) -> String
 			.format([repository_name, download_response_code]),
 		)
 		return ""
-	var download_responsee_body := download_request_result[3] as PackedByteArray
-	var metadata = JSON.parse_string(download_responsee_body.get_string_from_utf8())
+	var download_response_body := download_request_result[3] as PackedByteArray
+	var metadata = JSON.parse_string(download_response_body.get_string_from_utf8())
 	
 	for asset in metadata["assets"]:
 		if asset["name"] != ZIP_FILE_NAME: continue
@@ -118,7 +126,10 @@ func get_plugin_directory_path() -> String:
 	)
 
 func purge_self() -> void:
-	remove_directory_recursively(get_plugin_directory_path())
+	var plugin_directory_path := get_plugin_directory_path()
+	var plugin_reference := BrisklancePluginReference.find(plugin_directory_path)
+	plugin_reference.enable(false)
+	remove_directory_recursively(plugin_directory_path)
 
 func purge_all() -> void:
 	for mirror : BrisklancePluginMirror in dependencies:
@@ -133,8 +144,10 @@ func add_self_to_dependency_dictionary_recursively(p_dictionary: Dictionary) -> 
 func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	var plugin_directory_path := get_plugin_directory_path()
 	var plugin_reference := BrisklancePluginReference.find(plugin_directory_path)
-	if plugin_reference: return plugin_reference
-	
+	if plugin_reference: 
+		await p_http_request.get_tree().process_frame
+		plugin_reference.enable()
+		return plugin_reference
 	var mirror_url := await compute_download_mirror_request_url(p_http_request)
 	if mirror_url.is_empty(): return null
 	var temp_directory := DirAccess.create_temp(str(hash(repository_name)))
@@ -161,7 +174,11 @@ func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	print("'{0}' unzipped.".format([repository_name]))
 	
 	plugin_reference = BrisklancePluginReference.find(plugin_directory_path)
-	if not plugin_reference: purge_self()
+	if not plugin_reference: 
+		purge_self()
+		return null
+	await p_http_request.get_tree().process_frame
+	plugin_reference.enable()
 	return plugin_reference
 
 func install(p_http_request: HTTPRequest, p_already_installed_dependency_repository_names := []) -> bool:

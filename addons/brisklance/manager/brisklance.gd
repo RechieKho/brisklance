@@ -2,6 +2,7 @@
 extends EditorPlugin
 class_name BrisklanceEditorPlugin
 
+const ADDONS_DIRECTORY_PATH := "res://addons"
 const BRISKLANCE_DIRECTORY_PATH := "res://addons/brisklance"
 
 var manager_exclusion_plugin : BrisklanceManagerExcluderPlugin

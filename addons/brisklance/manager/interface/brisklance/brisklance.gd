@@ -6,6 +6,7 @@ class_name BrisklanceInterface
 @export var node_filter_edit : LineEdit
 @export var node_show_install_trigger : BaseButton
 @export var node_show_confirm_delete_trigger : BaseButton
+@export var node_refresh_trigger : BaseButton
 @export var node_addons_display : ItemList
 @export var node_github_setting_configure_trigger : BaseButton
 @export var node_install_window : Window
@@ -76,6 +77,10 @@ func _ready() -> void:
 		if not deletion_plugin_mirror: return
 		node_confirm_delete_window.dialog_text = "{0} '{1}'".format([delete_confirmation_text_prefix, deletion_plugin_mirror.repository_name])
 		node_confirm_delete_window.show()
+	)
+	
+	node_refresh_trigger.pressed.connect(func() -> void:
+		commit()
 	)
 	
 	node_confirm_delete_window.confirmed.connect(func() -> void:
