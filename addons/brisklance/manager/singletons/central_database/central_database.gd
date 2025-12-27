@@ -31,7 +31,7 @@ func install(p_http_request: HTTPRequest) -> void:
 func generate_dependency_dictionary() -> Dictionary:
 	var result := {}
 	for mirror : BrisklancePluginMirror in plugin_mirrors:
-		mirror.add_self_to_dependency_dictionary_recursively(result)
+		mirror.add_self_to_dependency_dictionary(result)
 	return result
 
 func get_database_file_path() -> String:

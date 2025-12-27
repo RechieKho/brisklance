@@ -136,10 +136,8 @@ func purge_all() -> void:
 		mirror.purge_all()
 	purge_self()
 
-func add_self_to_dependency_dictionary_recursively(p_dictionary: Dictionary) -> void:
+func add_self_to_dependency_dictionary(p_dictionary: Dictionary) -> void:
 	p_dictionary[repository_name] = repository_tag
-	for dependency : BrisklancePluginMirror in dependencies:
-		dependency.add_self_to_dependency_dictionary_recursively(p_dictionary)
 
 func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	var plugin_directory_path := get_plugin_directory_path()
