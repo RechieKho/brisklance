@@ -5,8 +5,10 @@ class_name BrisklanceInterface
 @export_group("Nodes", "node_")
 @export var node_filter_edit : LineEdit
 @export var node_show_install_trigger : BaseButton
-@export var node_show_confirm_delete_trigger : BaseButton
 @export var node_refresh_trigger : BaseButton
+@export var node_selection_actions : VBoxContainer
+@export var node_show_confirm_vendor_trigger : BaseButton
+@export var node_show_confirm_delete_trigger : BaseButton
 @export var node_addons_display : ItemList
 @export var node_github_setting_configure_trigger : BaseButton
 @export var node_install_window : Window
@@ -17,13 +19,19 @@ class_name BrisklanceInterface
 @export var node_github_setting_api_key_edit : LineEdit
 @export var node_github_setting_save_trigger : BaseButton
 @export var node_confirm_delete_window : ConfirmationDialog
+@export var node_confirm_vendor_window : ConfirmationDialog
 @export var node_http_request : HTTPRequest
 
 @export_group("Delete Confirmation", "delete_confirmation_")
 @export_multiline var delete_confirmation_text_prefix := "Are you sure you want to delete: "
 
+@export_group("Vendor Confirmation", "vendor_confirmation_")
+@export_multiline var vendor_confirmation_text_prefix := "Are you sure you want to vendor: "
+
+
 var filtered_plugin_mirror : Array
 var deletion_plugin_mirror : BrisklancePluginMirror
+var vendor_plugin_mirror : BrisklancePluginMirror
 
 static func get_packed_scene() -> PackedScene:
 	return preload("res://addons/brisklance/manager/interface/brisklance/brisklance.tscn") as PackedScene
@@ -58,6 +66,7 @@ func commit() -> void:
 	if not EditorInterface.get_resource_filesystem().is_scanning(): 
 		EditorInterface.get_resource_filesystem().scan()
 
+
 func _ready() -> void:
 	commit()
 	
@@ -79,6 +88,13 @@ func _ready() -> void:
 		node_confirm_delete_window.show()
 	)
 	
+	node_show_confirm_vendor_trigger.pressed.connect(func() -> void:
+		vendor_plugin_mirror = get_selected_plugin_mirror()
+		if not vendor_plugin_mirror: return
+		node_confirm_vendor_window.dialog_text = "{0} '{1}'".format([vendor_confirmation_text_prefix, vendor_plugin_mirror.repository_name])
+		node_confirm_vendor_window.show()
+	)
+	
 	node_refresh_trigger.pressed.connect(func() -> void:
 		commit()
 	)
@@ -88,6 +104,15 @@ func _ready() -> void:
 		deletion_plugin_mirror.purge_all()
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.erase(deletion_plugin_mirror)
 		commit()
+		deletion_plugin_mirror = null
+	)
+	
+	node_confirm_vendor_window.confirmed.connect(func() -> void:
+		if not vendor_plugin_mirror: return
+		vendor_plugin_mirror.vendor_self()
+		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.erase(vendor_plugin_mirror)
+		commit()
+		vendor_plugin_mirror = null
 	)
 	
 	node_configure_github_setting_window.close_requested.connect(func() -> void:
@@ -122,3 +147,4 @@ func _ready() -> void:
 		commit()
 		node_configure_github_setting_window.hide()
 	)
+	

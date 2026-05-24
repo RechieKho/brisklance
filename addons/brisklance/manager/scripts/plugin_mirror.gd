@@ -4,6 +4,7 @@ class_name BrisklancePluginMirror
 
 const ZIP_FILE_NAME := "brisklance_module.zip"
 const PLUGINS_DIRECTORY_NAME := "plugins"
+const VENDOR_DIRECTORY_NAME := "vendor"
 
 var repository_name : String
 var repository_tag : String
@@ -124,6 +125,17 @@ func get_plugin_directory_path() -> String:
 		.path_join(PLUGINS_DIRECTORY_NAME)
 		.path_join(make_legible_directory_name())
 	)
+
+func get_vendored_plugin_directory_path() -> String:
+	return (
+		BrisklanceEditorPlugin
+		.BRISKLANCE_DIRECTORY_PATH
+		.path_join(VENDOR_DIRECTORY_NAME)
+		.path_join(make_legible_directory_name())
+	)
+
+func vendor_self() -> void:
+	DirAccess.rename_absolute(get_plugin_directory_path(), get_vendored_plugin_directory_path())
 
 func purge_self() -> void:
 	var plugin_directory_path := get_plugin_directory_path()

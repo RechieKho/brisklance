@@ -1,7 +1,7 @@
 extends RefCounted
 class_name BrisklanceCentralDatabase
 
-const FILE_NAME := "central_database.txt"
+const FILE_NAME := "central_database.json"
 const HEAD_PLUGIN_MIRRORS_KEY := &"head_plugin_mirrors"
 
 var database := {}
@@ -45,7 +45,7 @@ func load_database() -> void:
 	if file_path.is_empty(): return
 	if not FileAccess.file_exists(file_path): return
 	var file := FileAccess.open(file_path, FileAccess.READ)
-	var parsed_content := str_to_var(file.get_as_text())
+	var parsed_content := JSON.parse_string(file.get_as_text())
 	if typeof(parsed_content) != TYPE_DICTIONARY: return
 	database = parsed_content
 
@@ -53,5 +53,5 @@ func save_database() -> void:
 	var file_path := get_database_file_path()
 	if file_path.is_empty(): return
 	var file := FileAccess.open(file_path, FileAccess.WRITE)
-	file.store_string(var_to_str(database))
+	file.store_string(JSON.stringify(database))
 	file.flush()
