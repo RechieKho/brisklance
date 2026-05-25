@@ -1,7 +1,7 @@
 extends RefCounted
 class_name BrisklanceLocalDevelopmentStore
 
-const FILE_NAME := "local_development_store.json"
+const FILE_NAME := "local_development_store.txt"
 const GITHUB_API_KEY_KEY := &"github_api_key"
 
 var store := {}
@@ -29,7 +29,7 @@ func load_store() -> void:
 	if file_path.is_empty(): return
 	if not FileAccess.file_exists(file_path): return
 	var file := FileAccess.open(file_path, FileAccess.READ)
-	var parsed_content := JSON.parse_string(file.get_as_text())
+	var parsed_content := str_to_var(file.get_as_text())
 	if typeof(parsed_content) != TYPE_DICTIONARY: return
 	store = parsed_content
 
@@ -37,5 +37,5 @@ func save_store() -> void:
 	var file_path := get_database_file_path()
 	if file_path.is_empty(): return
 	var file := FileAccess.open(file_path, FileAccess.WRITE)
-	file.store_string(JSON.stringify(store))
+	file.store_string(var_to_str(store))
 	file.flush()

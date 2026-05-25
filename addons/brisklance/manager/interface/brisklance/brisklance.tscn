@@ -28,7 +28,6 @@ node_github_setting_save_trigger = NodePath("ConfigureGithubSettingWindow/Panel/
 node_confirm_delete_window = NodePath("ConfirmDeleteWindow")
 node_confirm_vendor_window = NodePath("ConfirmVendorWindow")
 node_http_request = NodePath("HTTPRequest")
-vendor_confirmation_text_prefix = null
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=428407966]
 layout_mode = 1
