@@ -109,6 +109,14 @@ func _ready() -> void:
 	
 	node_confirm_vendor_window.confirmed.connect(func() -> void:
 		if not vendor_plugin_mirror: return
+		for dependency : BrisklancePluginMirror in vendor_plugin_mirror.dependencies:
+			var is_dependency_exists := false
+			for mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
+				if mirror.repository_name == dependency.repository_name:
+					is_dependency_exists = true
+					break
+			if not is_dependency_exists:
+				BrisklanceCentralDatabase.get_singleton().plugin_mirrors.append(dependency)
 		vendor_plugin_mirror.vendor_self()
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.erase(vendor_plugin_mirror)
 		commit()
