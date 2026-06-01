@@ -30,7 +30,12 @@ Here discusses the crucial directory and its description to further explain on h
 
 ## Dependency Resolution
 
-To make dependency resolution simplified, any conflicting dependent plugin should be resolved manually.
+Manual dependency management is employed due to the nature of Godot's architecture.
+Godot's module cannot be local; each module is global.
+Thus, we cannot install dependency that is local for a particular module like Node.js.
+As a result, the maintainer must be diligent on selecting the version of dependency that satisfies all plugins.
+
+Any conflicting dependent plugin should be resolved manually.
 Let's assume a scenario in which plugin Foo and plugin Bar both depend on plugin Car.
 Then, you must install plugin Car as the main plugins to install both Foo and Bar.
 This enforces you, the user, to choose the correct version of the plugin Car that works for both Foo and Bar.
