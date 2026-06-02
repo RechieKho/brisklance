@@ -1,18 +1,3 @@
 {
-&"head_plugin_mirrors": [Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/platformer_2d.brk","repository_tag":"v1.0.0","dependencies":[Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/meta_ui.brk","repository_tag":"v1.0.0","dependencies":[Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/local_db.brk","repository_tag":"v1.0.0","dependencies":[],"nested_dependencies":[])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/screen_space_effects.brk","repository_tag":"v1.0.3","dependencies":[],"nested_dependencies":[])
-],"nested_dependencies":[Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/local_db.brk","repository_tag":"v1.0.0","dependencies":[],"nested_dependencies":[])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/screen_space_effects.brk","repository_tag":"v1.0.3","dependencies":[],"nested_dependencies":[])
-])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/utility.brk","repository_tag":"v1.0.0","dependencies":[],"nested_dependencies":[])
-],"nested_dependencies":[Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/local_db.brk","repository_tag":"v1.0.0","dependencies":[],"nested_dependencies":[])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/screen_space_effects.brk","repository_tag":"v1.0.3","dependencies":[],"nested_dependencies":[])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/meta_ui.brk","repository_tag":"v1.0.0","dependencies":[Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/local_db.brk","repository_tag":"v1.0.0","dependencies":[],"nested_dependencies":[])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/screen_space_effects.brk","repository_tag":"v1.0.3","dependencies":[],"nested_dependencies":[])
-],"nested_dependencies":[Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/local_db.brk","repository_tag":"v1.0.0","dependencies":[],"nested_dependencies":[])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/screen_space_effects.brk","repository_tag":"v1.0.3","dependencies":[],"nested_dependencies":[])
-])
-, Object(RefCounted,"script":Resource("uid://cd4aw6q3ub4qx", "res://addons/brisklance/manager/scripts/plugin_mirror.gd"),"repository_name":"brisketty/utility.brk","repository_tag":"v1.0.0","dependencies":[],"nested_dependencies":[])
-])
-]
+&"head_plugin_mirrors": []
 }

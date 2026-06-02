@@ -70,10 +70,6 @@ text = "Delete"
 [node name="AddonsDisplay" type="ItemList" parent="MarginContainer/VBoxContainer" unique_id=2015576878]
 layout_mode = 2
 size_flags_vertical = 3
-item_count = 3
-item_0/text = "brisketty/platformer_2d.brk (v1.0.0)"
-item_1/text = "RechieKho/dummy.brk (v1.0.0)"
-item_2/text = "brisketty/local_db.brk (v1.0.0)"
 
 [node name="Footer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=973181731]
 layout_mode = 2
@@ -219,4 +215,5 @@ dialog_text = "Are you sure you want to vendor?
 Vendored plugins will be managed manually."
 
 [node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=733188208]
+download_file = "/var/folders/db/q7rbrbws669d9gckx16sm2jc0000gn/T/979498006-202606021346099708187/brisklance_module.zip"
 accept_gzip = false

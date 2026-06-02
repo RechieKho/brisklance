@@ -23,7 +23,10 @@ func find_dependant_mirrors(p_plugin_mirror: BrisklancePluginMirror) -> Array:
 	var result := []
 	for plugin_mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
 		for dependency : BrisklancePluginMirror in plugin_mirror.nested_dependencies:
-			if p_plugin_mirror.repository_name == dependency.repository_name:
+			if (
+				p_plugin_mirror.repository_name == dependency.repository_name and
+				p_plugin_mirror.repository_tag == dependency.repository_tag
+			):
 				result.append(plugin_mirror)
 	return result
 

@@ -148,8 +148,18 @@ func _ready() -> void:
 	node_install_trigger.pressed.connect(func() -> void:
 		if node_install_repository_name_edit.text.is_empty(): return
 		if node_install_tag_edit.text.is_empty(): return
-		var mirror := BrisklancePluginMirror.create(node_install_repository_name_edit.text, node_install_tag_edit.text)
-		if mirror.repository_name in BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names(): return
+		var mirror := BrisklancePluginMirror.create(node_install_repository_name_edit.text.to_lower(), node_install_tag_edit.text)
+		
+		BrisklanceCentralDatabase.get_singleton().plugin_mirrors = (
+			BrisklanceCentralDatabase.get_singleton().plugin_mirrors.filter(
+				func(p_plugin_mirrors: BrisklancePluginMirror) -> bool: return mirror.repository_name != p_plugin_mirrors.repository_name
+			)
+		)
+		for plugin_mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
+			for nested_dependency : BrisklancePluginMirror in plugin_mirror.nested_dependencies:
+				if nested_dependency.repository_name == mirror.repository_name:
+					nested_dependency.force_purge_all() # Remove 
+		
 		if not await mirror.retreive_self(node_http_request): return
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.push_back(mirror)
 		commit()
