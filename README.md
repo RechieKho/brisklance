@@ -30,12 +30,13 @@ Here discusses the crucial directory and its description to further explain on h
 
 ## Dependency Resolution
 
-Manual dependency management is employed due to the nature of Godot's architecture.
+First Come, First Serve manual dependency management is employed due to the nature of Godot's architecture.
 Godot's module cannot be local; each module is global.
-Thus, we cannot install dependency that is local for a particular module like Node.js.
-As a result, the maintainer must be diligent on selecting the version of dependency that satisfies all plugins.
+Thus, we cannot install a dependency that is local for a particular module like Node.js.
+As a result, the maintainer must be diligent in selecting the version of dependency that satisfies all plugins.
+Any conflicting dependency would be resolved by taking the existing plugin version (first come, first served basis).
 
-Any conflicting dependent plugin should be resolved manually.
 Let's assume a scenario in which plugin Foo and plugin Bar both depend on plugin Car.
-Then, you must install plugin Car as the main plugins to install both Foo and Bar.
-This enforces you, the user, to choose the correct version of the plugin Car that works for both Foo and Bar.
+Then, the version of the car will be installed depending on which dependent plugin is installed first.
+For this case, if Foo is installed first, then Foo's Car is installed.
+If the version is not suitable, the user will need to install the correct version of the car manually.
