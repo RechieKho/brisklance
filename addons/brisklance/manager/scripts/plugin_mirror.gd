@@ -9,6 +9,7 @@ const VENDOR_DIRECTORY_NAME := "vendor"
 var repository_name : String
 var repository_tag : String
 var dependencies : Array
+var nested_dependencies : Array
 
 static func remove_directory_recursively(p_directory_path: String) -> void:
 	var directory := DirAccess.open(p_directory_path)
@@ -143,7 +144,14 @@ func purge_self() -> void:
 	plugin_reference.enable(false)
 	remove_directory_recursively(plugin_directory_path)
 
+func force_purge_all() -> void:
+	for mirror : BrisklancePluginMirror in dependencies:
+		mirror.force_purge_all()
+	purge_self()
+
 func purge_all() -> void:
+	var dependant_mirrors := BrisklanceCentralDatabase.get_singleton().find_dependant_mirrors(self)
+	if len(dependant_mirrors) > 0: return
 	for mirror : BrisklancePluginMirror in dependencies:
 		mirror.purge_all()
 	purge_self()
@@ -192,22 +200,27 @@ func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	plugin_reference.enable()
 	return plugin_reference
 
-func install(p_http_request: HTTPRequest, p_already_installed_dependencies := BrisklanceCentralDatabase.get_singleton().plugin_mirrors.duplicate()) -> bool:
+func install(
+	p_http_request: HTTPRequest,
+	p_already_installed_dependencies := BrisklanceCentralDatabase.get_singleton().plugin_mirrors.duplicate()
+) -> Array:
 	dependencies.clear()
+	nested_dependencies.clear()
 	var plugin_reference := await retreive_self(p_http_request)
-	var plugin_mirror_repository_name := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
+	var plugin_mirror_repository_names := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
 	for dependency_repository_name : String in plugin_reference.dependency_dictionary.keys():
 		var dependency_repository_tag := plugin_reference.dependency_dictionary[dependency_repository_name] as String
 		var dependency := BrisklancePluginMirror.create(dependency_repository_name, dependency_repository_tag)
-		if dependency_repository_name in plugin_mirror_repository_name:
+		if dependency_repository_name in plugin_mirror_repository_names:
 			dependencies.append(dependency)
+			nested_dependencies.append(dependency)
 			continue
-		var head_get_plugin_mirror_repository_names := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
-		for p_already_installed_dependency : BrisklancePluginMirror in p_already_installed_dependencies:
-			if dependency_repository_name == p_already_installed_dependency.repository_name:
-				if not dependency_repository_name in head_get_plugin_mirror_repository_names:
-					BrisklanceCentralDatabase.get_singleton().plugin_mirrors.append(p_already_installed_dependency)
-		if not await dependency.install(p_http_request, p_already_installed_dependencies): return false
+		for already_installed_dependency : BrisklancePluginMirror in p_already_installed_dependencies:
+			if dependency_repository_name == already_installed_dependency.repository_name:
+				if not dependency_repository_name in plugin_mirror_repository_names:
+					BrisklanceCentralDatabase.get_singleton().plugin_mirrors.append(already_installed_dependency)
+		nested_dependencies.append_array(await dependency.install(p_http_request, p_already_installed_dependencies))
 		p_already_installed_dependencies.append(dependency)
 		dependencies.append(dependency)
-	return true
+		nested_dependencies.append(dependency)
+	return nested_dependencies

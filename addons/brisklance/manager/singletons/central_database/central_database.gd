@@ -18,12 +18,14 @@ static func get_singleton() -> BrisklanceCentralDatabase:
 		singleton.load_database()
 	return singleton
 
-func is_mirror_depended(p_plugin_mirror: BrisklancePluginMirror) -> bool:
-	for mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
-		for dependency : BrisklancePluginMirror in mirror.dependencies:
+
+func find_dependant_mirrors(p_plugin_mirror: BrisklancePluginMirror) -> Array:
+	var result := []
+	for plugin_mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
+		for dependency : BrisklancePluginMirror in plugin_mirror.nested_dependencies:
 			if p_plugin_mirror.repository_name == dependency.repository_name:
-				return true
-	return false
+				result.append(plugin_mirror)
+	return result
 
 func get_plugin_mirror_repository_names() -> Array:
 	return plugin_mirrors.map(func(p_mirror: BrisklancePluginMirror) -> String:

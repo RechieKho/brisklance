@@ -70,6 +70,10 @@ text = "Delete"
 [node name="AddonsDisplay" type="ItemList" parent="MarginContainer/VBoxContainer" unique_id=2015576878]
 layout_mode = 2
 size_flags_vertical = 3
+item_count = 3
+item_0/text = "brisketty/platformer_2d.brk (v1.0.0)"
+item_1/text = "RechieKho/dummy.brk (v1.0.0)"
+item_2/text = "brisketty/local_db.brk (v1.0.0)"
 
 [node name="Footer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=973181731]
 layout_mode = 2

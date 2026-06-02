@@ -101,18 +101,27 @@ func _ready() -> void:
 	
 	node_confirm_delete_window.confirmed.connect(func() -> void:
 		if not deletion_plugin_mirror: return
+		var dependant_mirrors := BrisklanceCentralDatabase.get_singleton().find_dependant_mirrors(deletion_plugin_mirror)
+		if len(dependant_mirrors) > 1:
+			print("{0} is depended by more than one plugins, thus cannot be deleted. The dependant plugins are {1}.".format([
+				deletion_plugin_mirror.repository_name,
+				", ".join(dependant_mirrors.map(
+					func(p_plugin_mirror: BrisklancePluginMirror) -> String: return p_plugin_mirror.repository_name
+				))
+			]))
+			deletion_plugin_mirror = null
+			return
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.erase(deletion_plugin_mirror)
-		if not BrisklanceCentralDatabase.get_singleton().is_mirror_depended(deletion_plugin_mirror):
-			deletion_plugin_mirror.purge_all()
+		deletion_plugin_mirror.purge_all()
 		commit()
 		deletion_plugin_mirror = null
 	)
 	
 	node_confirm_vendor_window.confirmed.connect(func() -> void:
 		if not vendor_plugin_mirror: return
-		var head_plugin_mirror_repository_names := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
+		var plugin_mirror_repository_names := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
 		for dependency : BrisklancePluginMirror in vendor_plugin_mirror.dependencies:
-			if not dependency.repository_name in head_plugin_mirror_repository_names:
+			if not dependency.repository_name in plugin_mirror_repository_names:
 				BrisklanceCentralDatabase.get_singleton().plugin_mirrors.append(dependency)
 		vendor_plugin_mirror.vendor_self()
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.erase(vendor_plugin_mirror)
