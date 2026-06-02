@@ -1,7 +1,7 @@
 extends RefCounted
 class_name BrisklanceCentralDatabase
 
-const FILE_NAME := "central_database.txt"
+const FILE_NAME := "central_database.dat"
 const HEAD_PLUGIN_MIRRORS_KEY := &"head_plugin_mirrors"
 
 var database := {}

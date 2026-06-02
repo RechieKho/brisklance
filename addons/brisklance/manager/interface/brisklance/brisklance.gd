@@ -150,11 +150,16 @@ func _ready() -> void:
 		if node_install_tag_edit.text.is_empty(): return
 		var mirror := BrisklancePluginMirror.create(node_install_repository_name_edit.text.to_lower(), node_install_tag_edit.text)
 		
+		for plugin_mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
+			if mirror.repository_name == plugin_mirror.repository_name:
+				plugin_mirror.force_purge_all()
+		
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors = (
 			BrisklanceCentralDatabase.get_singleton().plugin_mirrors.filter(
 				func(p_plugin_mirrors: BrisklancePluginMirror) -> bool: return mirror.repository_name != p_plugin_mirrors.repository_name
 			)
 		)
+		
 		for plugin_mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
 			for nested_dependency : BrisklancePluginMirror in plugin_mirror.nested_dependencies:
 				if nested_dependency.repository_name == mirror.repository_name:
