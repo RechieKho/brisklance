@@ -101,21 +101,18 @@ func _ready() -> void:
 	
 	node_confirm_delete_window.confirmed.connect(func() -> void:
 		if not deletion_plugin_mirror: return
-		deletion_plugin_mirror.purge_all()
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.erase(deletion_plugin_mirror)
+		if not BrisklanceCentralDatabase.get_singleton().is_mirror_depended(deletion_plugin_mirror):
+			deletion_plugin_mirror.purge_all()
 		commit()
 		deletion_plugin_mirror = null
 	)
 	
 	node_confirm_vendor_window.confirmed.connect(func() -> void:
 		if not vendor_plugin_mirror: return
+		var head_plugin_mirror_repository_names := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
 		for dependency : BrisklancePluginMirror in vendor_plugin_mirror.dependencies:
-			var is_dependency_exists := false
-			for mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
-				if mirror.repository_name == dependency.repository_name:
-					is_dependency_exists = true
-					break
-			if not is_dependency_exists:
+			if not dependency.repository_name in head_plugin_mirror_repository_names:
 				BrisklanceCentralDatabase.get_singleton().plugin_mirrors.append(dependency)
 		vendor_plugin_mirror.vendor_self()
 		BrisklanceCentralDatabase.get_singleton().plugin_mirrors.erase(vendor_plugin_mirror)

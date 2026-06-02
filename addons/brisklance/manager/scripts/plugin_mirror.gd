@@ -192,19 +192,22 @@ func retreive_self(p_http_request: HTTPRequest) -> BrisklancePluginReference:
 	plugin_reference.enable()
 	return plugin_reference
 
-func install(p_http_request: HTTPRequest, p_already_installed_dependency_repository_names := []) -> bool:
+func install(p_http_request: HTTPRequest, p_already_installed_dependencies := BrisklanceCentralDatabase.get_singleton().plugin_mirrors.duplicate()) -> bool:
 	dependencies.clear()
 	var plugin_reference := await retreive_self(p_http_request)
 	var plugin_mirror_repository_name := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
 	for dependency_repository_name : String in plugin_reference.dependency_dictionary.keys():
-		if dependency_repository_name in plugin_mirror_repository_name: continue
-		if dependency_repository_name in p_already_installed_dependency_repository_names:
-			purge_all()
-			printerr("Plugin conflict: '{0}' attempted to be installed by '{1}' is already installed, please install the dependency manually to proceed.".format([dependency_repository_name, repository_name]))
-			return false
 		var dependency_repository_tag := plugin_reference.dependency_dictionary[dependency_repository_name] as String
 		var dependency := BrisklancePluginMirror.create(dependency_repository_name, dependency_repository_tag)
-		if not await dependency.install(p_http_request, p_already_installed_dependency_repository_names): return false
-		p_already_installed_dependency_repository_names.append(dependency_repository_name)
+		if dependency_repository_name in plugin_mirror_repository_name:
+			dependencies.append(dependency)
+			continue
+		var head_get_plugin_mirror_repository_names := BrisklanceCentralDatabase.get_singleton().get_plugin_mirror_repository_names()
+		for p_already_installed_dependency : BrisklancePluginMirror in p_already_installed_dependencies:
+			if dependency_repository_name == p_already_installed_dependency.repository_name:
+				if not dependency_repository_name in head_get_plugin_mirror_repository_names:
+					BrisklanceCentralDatabase.get_singleton().plugin_mirrors.append(p_already_installed_dependency)
+		if not await dependency.install(p_http_request, p_already_installed_dependencies): return false
+		p_already_installed_dependencies.append(dependency)
 		dependencies.append(dependency)
 	return true
