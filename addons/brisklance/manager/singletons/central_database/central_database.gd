@@ -1,7 +1,7 @@
 extends RefCounted
 class_name BrisklanceCentralDatabase
 
-const FILE_NAME := "central_database.txt"
+const FILE_NAME := "central_database.dat"
 const HEAD_PLUGIN_MIRRORS_KEY := &"head_plugin_mirrors"
 
 var database := {}
@@ -18,15 +18,27 @@ static func get_singleton() -> BrisklanceCentralDatabase:
 		singleton.load_database()
 	return singleton
 
+
+func find_dependant_mirrors(p_plugin_mirror: BrisklancePluginMirror) -> Array:
+	var result := []
+	for plugin_mirror : BrisklancePluginMirror in BrisklanceCentralDatabase.get_singleton().plugin_mirrors:
+		for dependency : BrisklancePluginMirror in plugin_mirror.nested_dependencies:
+			if (
+				p_plugin_mirror.repository_name == dependency.repository_name and
+				p_plugin_mirror.repository_tag == dependency.repository_tag
+			):
+				result.append(plugin_mirror)
+	return result
+
 func get_plugin_mirror_repository_names() -> Array:
 	return plugin_mirrors.map(func(p_mirror: BrisklancePluginMirror) -> String:
 		return p_mirror.repository_name
 	)
 
 func install(p_http_request: HTTPRequest) -> void:
-	var existing_dependency_repository_name := []
+	var existing_dependencies := plugin_mirrors.duplicate()
 	for plugin_mirror : BrisklancePluginMirror in plugin_mirrors:
-		await plugin_mirror.install(p_http_request, existing_dependency_repository_name)
+		await plugin_mirror.install(p_http_request, existing_dependencies)
 
 func generate_dependency_dictionary() -> Dictionary:
 	var result := {}

@@ -215,4 +215,5 @@ dialog_text = "Are you sure you want to vendor?
 Vendored plugins will be managed manually."
 
 [node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=733188208]
+download_file = "/var/folders/db/q7rbrbws669d9gckx16sm2jc0000gn/T/979498006-202606021346099708187/brisklance_module.zip"
 accept_gzip = false

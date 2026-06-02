@@ -1,7 +1,7 @@
 extends RefCounted
 class_name BrisklanceLocalDevelopmentStore
 
-const FILE_NAME := "local_development_store.txt"
+const FILE_NAME := "local_development_store.dat"
 const GITHUB_API_KEY_KEY := &"github_api_key"
 
 var store := {}
